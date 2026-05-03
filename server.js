@@ -12,13 +12,33 @@ const app = express();
 connectDB();
 
 // Middleware - CORS Configuration
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173").split(",").map(url => url.trim());
-app.use(cors({ 
-  origin: allowedOrigins, 
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allowed origins for CORS
+    const allowedOrigins = [
+      "https://team-task-manager-kappa-five.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:3000"
+    ];
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS not allowed for origin: ${origin}`));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  maxAge: 86400 // 24 hours
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options("*", cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
