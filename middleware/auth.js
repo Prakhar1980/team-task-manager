@@ -26,10 +26,12 @@ const protect = async (req, res, next) => {
     }
 
     next();
-  } catch (error) {    console.error(\"Auth middleware error:\", {
+  } catch (error) {
+    console.error("Auth middleware error:", {
       name: error.name,
       message: error.message
-    });    if (error.name === "JsonWebTokenError") {
+    });
+    if (error.name === "JsonWebTokenError") {
       return res.status(401).json({ message: "Invalid token." });
     }
     if (error.name === "TokenExpiredError") {
