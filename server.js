@@ -1,6 +1,5 @@
 // backend/server.js
 const express = require("express");
-const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
@@ -20,43 +19,31 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Middleware - CORS Configuration - MUST BE FIRST
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Whitelist of allowed origins
-    const whitelist = [
-      "https://team-task-manager-kappa-five.vercel.app",
-      "http://localhost:5173",
-      "http://localhost:3000"
-    ];
-    
-    // Allow requests with no origin (mobile, curl, postman)
-    if (!origin || whitelist.includes(origin)) {
-      callback(null, true);
-    } else {
-      // Still allow to prevent preflight from failing
-      console.log(`[CORS] Allowing request from: ${origin}`);
-      callback(null, true);
-    }
-  },
-  credentials: false,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  exposedHeaders: ["Content-Type", "Authorization"],
-  maxAge: 3600,
-  optionsSuccessStatus: 200
-};
-
-// CORS MUST be first - before everything else
-app.use(cors(corsOptions));
-
-// Explicit preflight handler
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,PATCH");
-  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With");
+// ===== CRITICAL: CORS SETUP - MUST BE FIRST =====
+// Add CORS headers to ALL responses
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    "https://team-task-manager-kappa-five.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000"
+  ];
+  
+  const origin = req.headers.origin;
+  
+  // Set CORS headers
+  res.header("Access-Control-Allow-Origin", allowedOrigins.includes(origin) ? origin : "*");
+  res.header("Access-Control-Allow-Credentials", "false");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+  res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, X-Requested-With, Accept");
   res.header("Access-Control-Max-Age", "3600");
-  res.sendStatus(200);
+  
+  // Handle preflight
+  if (req.method === "OPTIONS") {
+    console.log(`[PREFLIGHT] ${req.method} ${req.path} from ${origin}`);
+    return res.sendStatus(200);
+  }
+  
+  next();
 });
 
 // Body parsers
