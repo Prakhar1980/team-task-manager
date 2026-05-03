@@ -6,6 +6,15 @@ const connectDB = require("./config/db");
 
 dotenv.config();
 
+// Validate critical environment variables
+const requiredEnvVars = ["MONGO_URI", "JWT_SECRET"];
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+if (missingEnvVars.length > 0) {
+  console.error(`CRITICAL: Missing required environment variables: ${missingEnvVars.join(", ")}`);
+  console.error("Server cannot start without these variables. Please check your .env file.");
+  process.exit(1);
+}
+
 const app = express();
 
 // Connect to MongoDB
@@ -77,4 +86,9 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`✅ Frontend URL: ${process.env.CLIENT_URL || "not configured"}`);
+  console.log(`✅ All systems ready!`);
+});

@@ -32,6 +32,10 @@ export default function Signup() {
       setError("Password must be at least 6 characters.");
       return;
     }
+    if (!/[A-Z]/.test(form.password)) {
+      setError("Password must contain at least one uppercase letter (A-Z).");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -107,7 +111,7 @@ export default function Signup() {
               name="password"
               value={form.password}
               onChange={handleChange}
-              placeholder="At least 6 characters"
+              placeholder="Min 6 characters with uppercase letter (e.g., Password1)"
               required
             />
           </div>
