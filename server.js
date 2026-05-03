@@ -22,17 +22,19 @@ connectDB();
 
 // CORS must be registered before routes so preflight requests never hit auth/controllers.
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  ...(process.env.CLIENT_URL || "").split(","),
   "https://team-task-manager-kappa-five.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
 ]
   .filter(Boolean)
-  .map((origin) => origin.replace(/\/$/, ""));
+  .map((origin) => origin.trim().replace(/\/$/, ""));
+
+const uniqueAllowedOrigins = [...new Set(allowedOrigins)];
 
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+    if (!origin || uniqueAllowedOrigins.includes(origin.replace(/\/$/, ""))) {
       return callback(null, true);
     }
 
@@ -95,8 +97,8 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`✅ Frontend URL: ${process.env.CLIENT_URL || "not configured"}`);
-  console.log(`✅ All systems ready!`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`Allowed CORS origins: ${uniqueAllowedOrigins.join(", ")}`);
+  console.log("All systems ready.");
 });
