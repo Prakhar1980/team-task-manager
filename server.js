@@ -22,20 +22,42 @@ connectDB();
 
 // Middleware - CORS Configuration - MUST BE FIRST
 const corsOptions = {
-  origin: "*", // Allow all origins for now
+  origin: function (origin, callback) {
+    // Whitelist of allowed origins
+    const whitelist = [
+      "https://team-task-manager-kappa-five.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:3000"
+    ];
+    
+    // Allow requests with no origin (mobile, curl, postman)
+    if (!origin || whitelist.includes(origin)) {
+      callback(null, true);
+    } else {
+      // Still allow to prevent preflight from failing
+      console.log(`[CORS] Allowing request from: ${origin}`);
+      callback(null, true);
+    }
+  },
   credentials: false,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  exposedHeaders: ["Content-Type"],
+  exposedHeaders: ["Content-Type", "Authorization"],
   maxAge: 3600,
   optionsSuccessStatus: 200
 };
 
-// CORS MUST be applied BEFORE all routes
+// CORS MUST be first - before everything else
 app.use(cors(corsOptions));
 
-// Explicit OPTIONS handler for all routes
-app.options("*", cors(corsOptions));
+// Explicit preflight handler
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,PATCH");
+  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With");
+  res.header("Access-Control-Max-Age", "3600");
+  res.sendStatus(200);
+});
 
 // Body parsers
 app.use(express.json({ limit: "10mb" }));
