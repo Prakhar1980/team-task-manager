@@ -20,36 +20,21 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Middleware - CORS Configuration
+// Middleware - CORS Configuration - MUST BE FIRST
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allowed origins for CORS
-    const allowedOrigins = [
-      "https://team-task-manager-kappa-five.vercel.app",
-      "http://localhost:5173",
-      "http://localhost:3000"
-    ];
-
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked request from origin: ${origin}`);
-      callback(null, true); // Allow it anyway for preflight to work
-    }
-  },
-  credentials: true,
+  origin: "*", // Allow all origins for now
+  credentials: false,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   exposedHeaders: ["Content-Type"],
-  maxAge: 86400, // 24 hours
+  maxAge: 3600,
   optionsSuccessStatus: 200
 };
 
-// Apply CORS BEFORE all other middleware
+// CORS MUST be applied BEFORE all routes
 app.use(cors(corsOptions));
 
-// Explicit preflight handler
+// Explicit OPTIONS handler for all routes
 app.options("*", cors(corsOptions));
 
 // Body parsers
