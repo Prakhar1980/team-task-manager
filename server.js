@@ -1,6 +1,7 @@
 // backend/server.js
 const express = require("express");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const connectDB = require("./config/db");
 
 dotenv.config();
@@ -19,45 +20,53 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// ===== CRITICAL: CORS SETUP - MUST BE FIRST =====
-// Add CORS headers to ALL responses
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    "https://team-task-manager-kappa-five.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:3000"
-  ];
-  
-  const origin = req.headers.origin;
-  
-  // Set CORS headers
-  res.header("Access-Control-Allow-Origin", allowedOrigins.includes(origin) ? origin : "*");
-  res.header("Access-Control-Allow-Credentials", "false");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
-  res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, X-Requested-With, Accept");
-  res.header("Access-Control-Max-Age", "3600");
-  
-  // Handle preflight
-  if (req.method === "OPTIONS") {
-    console.log(`[PREFLIGHT] ${req.method} ${req.path} from ${origin}`);
-    return res.sendStatus(200);
-  }
-  
-  next();
-});
+// CORS must be registered before routes so preflight requests never hit auth/controllers.
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://team-task-manager-kappa-five.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+]
+  .filter(Boolean)
+  .map((origin) => origin.replace(/\/$/, ""));
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked origin: ${origin}`));
+  },
+  credentials: false,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Origin", "Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  maxAge: 3600,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // Body parsers
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Health checks
+app.get("/", (req, res) => res.json({ message: "Team Task Manager API running" }));
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "team-task-manager-api",
+    environment: process.env.NODE_ENV || "development",
+  });
+});
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/projects", require("./routes/projects"));
 app.use("/api/tasks", require("./routes/tasks"));
 app.use("/api/dashboard", require("./routes/dashboard"));
-
-// Health check
-app.get("/", (req, res) => res.json({ message: "Team Task Manager API running" }));
 
 // 404 handler
 app.use((req, res) => {
