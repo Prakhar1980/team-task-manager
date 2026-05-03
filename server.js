@@ -6,13 +6,18 @@ const connectDB = require("./config/db");
 
 dotenv.config();
 
-// Validate critical environment variables
-const requiredEnvVars = ["MONGO_URI", "JWT_SECRET"];
+// Validate startup-critical environment variables.
+// JWT_SECRET is checked inside auth routes so health/CORS diagnostics still work.
+const requiredEnvVars = ["MONGO_URI"];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 if (missingEnvVars.length > 0) {
   console.error(`CRITICAL: Missing required environment variables: ${missingEnvVars.join(", ")}`);
   console.error("Server cannot start without these variables. Please check your .env file.");
   process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+  console.warn("WARNING: JWT_SECRET is not set. Auth endpoints will return a configuration error.");
 }
 
 const app = express();

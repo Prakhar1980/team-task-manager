@@ -83,18 +83,37 @@ VITE_API_URL=http://localhost:5000/api
 
 1. Push to GitHub
 2. Connect repo to Railway
-3. Add env vars:
-   - `MONGO_URI` - MongoDB connection
-   - `JWT_SECRET` - Random secret key
-   - `CLIENT_URL` - Your frontend URL
-4. Deploy automatically on push
+3. Set the backend root directory to the folder that contains `server.js`
+4. Add these Railway Variables exactly:
+   - `MONGO_URI` - MongoDB Atlas connection string
+   - `JWT_SECRET` - Long random secret, at least 32 characters
+   - `JWT_EXPIRES_IN=7d`
+   - `NODE_ENV=production`
+   - `CLIENT_URL=https://team-task-manager-kappa-five.vercel.app`
+5. Deploy automatically on push
 
-### Railway Frontend
+Important: Railway does not use your local `.env` or `.env.production` file unless you manually add those values in Railway Variables. If `JWT_SECRET` is missing, the backend exits during startup and the browser may show a misleading CORS error because requests never reach Express.
 
-1. Connect frontend to Railway
+After deploy, verify the backend URL directly:
+
+```text
+https://your-railway-domain.up.railway.app/api/health
+```
+
+Expected response:
+
+```json
+{"status":"ok","service":"team-task-manager-api","environment":"production"}
+```
+
+### Vercel Frontend
+
+1. Connect the `frontend` folder to Vercel
 2. Set env var:
-   - `VITE_API_URL=https://your-backend-url.railway.app/api`
+   - `VITE_API_URL=https://your-railway-domain.up.railway.app/api`
 3. Deploy
+
+Important: Vite bakes `VITE_API_URL` into the production JavaScript bundle. If you change the Railway backend domain, redeploy Vercel after updating this variable.
 
 ## How to Use
 
