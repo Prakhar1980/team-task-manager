@@ -1,153 +1,113 @@
-# 📋 Team Task Manager
+# Team Task Manager
 
-A full-stack web application for managing projects and tasks in teams. Admins create projects and assign tasks to team members, while members track their work progress and update task statuses. Built with React, Node.js, Express, and MongoDB.
+A full-stack task management app for teams. Admins can create projects and assign tasks, members track their work. Built with React, Node.js, Express, and MongoDB.
 
-## 🎯 Features
+## Features
 
-- **User Authentication**: Secure signup/login with JWT tokens and password hashing
-- **Role-Based Access**: Admin and Member roles with different permissions
-- **Project Management**: Create, edit, and manage projects with team members
-- **Task Management**: Create tasks, assign to team members, set priorities and due dates
-- **Dashboard**: Real-time analytics showing task statistics, completion rates, and overdue tasks
-- **Task Tracking**: Filter and view tasks by status, priority, and project
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- User auth with JWT + password hashing
+- Admin and Member roles with different perms
+- Create projects and manage team tasks
+- Task assignment, priority levels, due dates
+- Dashboard with task stats and completion tracking
+- Filter tasks by status, priority, project
+- Mobile responsive
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Backend:**
-- Node.js with Express.js
-- MongoDB with Mongoose ODM
-- JWT for authentication
-- bcryptjs for password hashing
-- Express-validator for input validation
+- Node.js + Express
+- MongoDB with Mongoose
+- JWT auth
+- bcryptjs for passwords
+- Express-validator
 
 **Frontend:**
-- React 18 with React Router
-- Vite for fast bundling
-- Axios for API requests
-- Date-fns for date utilities
-- React Hot Toast for notifications
+- React 18 + React Router
+- Vite
+- Axios
+- Date-fns
+- React Hot Toast
 
-## 📦 Installation
+## Getting Started
 
-### Prerequisites
+### Requirements
 - Node.js (v16+)
-- npm or yarn
-- MongoDB Atlas account or local MongoDB
+- MongoDB (Atlas or local)
+- npm/yarn
 
-### Backend Setup
+### Backend
 
-1. Navigate to the backend directory:
 ```bash
-cd backend
-```
-
-2. Create a `.env` file from `.env.example`:
-```bash
+cd team-task-manager
 cp .env.example .env
-```
-
-3. Update `.env` with your configuration:
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key_min_32_chars
-CLIENT_URL=http://localhost:5173
-```
-
-4. Install dependencies:
-```bash
+# Edit .env with your values
 npm install
-```
-
-5. Start the server:
-```bash
-npm start          # Production
-npm run dev        # Development with hot reload
-```
-
-The backend will run on `http://localhost:5000`
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-```bash
-cd frontend
-```
-
-2. Create a `.env` file from `.env.example`:
-```bash
-cp .env.example .env
-```
-
-3. Install dependencies:
-```bash
-npm install
-```
-
-4. Start the development server:
-```bash
 npm run dev
 ```
 
-The frontend will run on `http://localhost:5173`
+Runs on `http://localhost:5000`
 
-## 🔑 Environment Variables
+### Frontend
 
-### Backend (.env)
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| PORT | Server port | 5000 |
-| MONGO_URI | MongoDB connection string | mongodb://... |
-| JWT_SECRET | Secret key for JWT signing (min 32 chars) | abc123... |
-| JWT_EXPIRES_IN | JWT token expiration time | 7d |
-| CLIENT_URL | Frontend URL for CORS | http://localhost:5173 |
+Runs on `http://localhost:5173`
 
-### Frontend (.env)
+## Environment Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| VITE_API_URL | Backend API base URL | http://localhost:5000/api |
+### Backend
 
-## 🚀 Deployment on Railway
+```env
+PORT=5000
+MONGO_URI=mongodb://...
+JWT_SECRET=your_secret_key_here
+JWT_EXPIRES_IN=7d
+CLIENT_URL=http://localhost:5173
+NODE_ENV=development
+```
 
-### Backend Deployment
+### Frontend
 
-1. Push your project to GitHub
-2. Go to [Railway.app](https://railway.app) and sign up
-3. Create a new project and select your GitHub repository
-4. Add environment variables in Railway:
-   - `MONGO_URI`: Your MongoDB Atlas connection string
-   - `JWT_SECRET`: A strong random string (min 32 characters)
-   - `CLIENT_URL`: Your deployed frontend URL
-   - `PORT`: Leave empty for Railway's default
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-5. Railway automatically detects Node.js and runs `npm start`
-6. Copy the deployed URL (e.g., `https://your-project.railway.app`)
+## Deployment
 
-### Frontend Deployment
+### Railway Backend
 
-1. Create a new Railway project
-2. Select your GitHub repository
-3. Add environment variable:
-   - `VITE_API_URL`: Your deployed backend URL (e.g., `https://backend-project.railway.app/api`)
+1. Push to GitHub
+2. Connect repo to Railway
+3. Add env vars:
+   - `MONGO_URI` - MongoDB connection
+   - `JWT_SECRET` - Random secret key
+   - `CLIENT_URL` - Your frontend URL
+4. Deploy automatically on push
 
-4. Railway detects Vite and runs `npm run build` → `npm run preview`
-5. Your frontend will be available at Railway's assigned URL
+### Railway Frontend
 
-## 💡 Usage
+1. Connect frontend to Railway
+2. Set env var:
+   - `VITE_API_URL=https://your-backend-url.railway.app/api`
+3. Deploy
 
-### For Admins
-1. Sign up with any email and select "Admin"
-2. Create projects and invite team members
-3. Create tasks and assign them to members
-4. Track project progress from the dashboard
+## How to Use
 
-### For Members
-1. Sign up with any email and select "Member"
-2. View assigned tasks on the dashboard
-3. Update task status (Pending → In Progress → Completed)
+**Admin:**
+- Sign up as Admin
+- Create projects
+- Assign tasks to team members
+- View dashboard stats
+
+**Members:**
+- Sign up as Member
+- See your assigned tasks
+- Update task status
 4. Track personal task completion
 
 ## 📊 API Endpoints

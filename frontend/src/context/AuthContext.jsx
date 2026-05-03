@@ -42,12 +42,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signup = useCallback(async (name, email, password, role) => {
-    const res = await api.post("/auth/signup", { name, email, password, role });
-    const { token, user } = res.data;
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    setUser(user);
-    return user;
+    try {
+      const res = await api.post("/auth/signup", { name, email, password, role });
+      const { token, user } = res.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+      return user;
+    } catch (err) {
+      console.error("Signup error:", err.response?.data || err.message);
+      throw err;
+    }
   }, []);
 
   const logout = useCallback(() => {

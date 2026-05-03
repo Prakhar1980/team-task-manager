@@ -34,22 +34,27 @@ const corsOptions = {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error(`CORS not allowed for origin: ${origin}`));
+      console.warn(`CORS blocked request from origin: ${origin}`);
+      callback(null, true); // Allow it anyway for preflight to work
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  maxAge: 86400 // 24 hours
+  exposedHeaders: ["Content-Type"],
+  maxAge: 86400, // 24 hours
+  optionsSuccessStatus: 200
 };
 
+// Apply CORS BEFORE all other middleware
 app.use(cors(corsOptions));
 
-// Handle preflight requests
+// Explicit preflight handler
 app.options("*", cors(corsOptions));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Body parsers
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));

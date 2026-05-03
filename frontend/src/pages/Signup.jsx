@@ -43,7 +43,9 @@ export default function Signup() {
       toast.success(`Welcome to TaskForge, ${newUser.name}!`);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Signup failed. Please try again.");
+      const errorMsg = err.response?.data?.message || err.message || "Signup failed. Please try again.";
+      console.error("Signup failed:", errorMsg);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
